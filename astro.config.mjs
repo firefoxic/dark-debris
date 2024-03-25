@@ -3,10 +3,11 @@ import mdx from '@astrojs/mdx';
 
 import sitemap from '@astrojs/sitemap';
 
+import { getProjectRoot } from "./utils/getProjectRoot.js"
+
 // https://astro.build/config
 export default defineConfig({
-	base: '/dark-debris',
-	baseUrl: process.env.NODE_ENV === `development` ? `/` : `/dark-debris`,
-	site: 'https://example.com',
+	base: getProjectRoot(),
+	site: 'https://firefoxic.github.io/',
 	integrations: [mdx(), sitemap()],
 });
