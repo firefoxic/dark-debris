@@ -7,5 +7,5 @@ import { normalize } from "node:path"
  * @return {string} The normalized path.
  */
 export function normalizePath(path) {
-	return normalize(import.meta.env.BASE_URL + path)
+	return path && normalize(import.meta.env.BASE_URL + path)
 }
