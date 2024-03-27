@@ -1,0 +1,77 @@
+name: Deploy on pull request
+
+on:
+  pull_request_target:
+    branches:
+      - '*'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets the GITHUB_TOKEN permissions to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: 'refs/pull/${{ github.event.pull_request.number }}/merge'
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: 'package.json'
+
+      - name: Restore cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.local/share/pnpm/store/v3
+          key: cache-pnpm-${{ hashFiles('./package-lock.json') }}
+          restore-keys: cache-pnpm-
+
+      - name: Install dependencies
+        run: corepack enable pnpm && pnpm i
+
+      - name: Build project
+        run: pnpm build
+        env:
+          REPO_NAME: ${{ github.event.repository.name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ env.PATH_TO_DIST }}
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          preview: true
+
+      # - name: Deploy
+      #   uses: JamesIves/github-pages-deploy-action@v4
+      #   with:
+      #     folder: ${{ env.PATH_TO_DIST }}
+      #     branch: gh-pages
+      #     target-folder: ${{ github.event.pull_request.number }}
