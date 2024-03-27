@@ -66,8 +66,8 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        with:
-          preview: true
+        # with:
+        #   preview: true
 
       # - name: Deploy
       #   uses: JamesIves/github-pages-deploy-action@v4
